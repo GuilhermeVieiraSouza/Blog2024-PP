@@ -73,13 +73,16 @@ def editar_noticia(request, id):
 def listagem_categoria(request):
     formularioFiltro = CategoriaFilterForm(request.GET or None)
     categorias_lista = Categoria.objects.all().order_by(Lower('nome'))
+    if formularioFiltro.is_valid(): 
+        print('primeiro if')
+        if formularioFiltro.cleaned_data['nome']:
+            print('segundo if')
+            categorias_lista = categorias_lista.filter(nome__icontains=formularioFiltro.cleaned_data['nome'])
+            print('pos categoria')
+        
     paginator = Paginator(categorias_lista, 5)
     page = request.GET.get('page', 1)
     categorias = paginator.page(page)
-    if formularioFiltro.is_valid():
-        if formularioFiltro.cleaned_data['nome']:
-            categorias = categorias.filter(nome__icontains=formularioFiltro.cleaned_data['nome'])
-        
     contexto = {
         'categorias': categorias,
         'formularioFiltro': formularioFiltro
